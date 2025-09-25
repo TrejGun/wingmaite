@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { User } from '../models/user.model';
-import { randomUUID } from 'crypto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UserEntity } from '../models/user.model';
 
 @Injectable()
 export class UsersService {
-    private users: User[] = [];
+    constructor(
+        @InjectRepository(UserEntity)
+        private readonly userEntityRepository: Repository<UserEntity>,
+    ) {}
 
     async fetchUserWithId(id: string) {
-        return this.users.find((u) => u.id === id) ?? null;
+        return this.userEntityRepository.findOne({ where: { id } });
     }
 
     async createUser(user: {
@@ -16,15 +20,7 @@ export class UsersService {
         email: string;
         password: string;
     }) {
-        const newUser: User = {
-            id: randomUUID(),
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            password: user.password,
-        };
-        this.users.push(newUser);
-        return newUser;
+        return this.userEntityRepository.create(user).save();
     }
 
     async updateUser(
@@ -36,15 +32,18 @@ export class UsersService {
             password?: string;
         },
     ) {
-        const index = this.users.findIndex((u) => u.id === id);
-        if (index === -1) {
-            throw new Error(`User not found`);
+        const userEntity = await this.fetchUserWithId(id);
+
+        if (!userEntity) {
+            throw new NotFoundException('User not found');
         }
-        const user = this.users[index];
-        this.users[index] = {
-            ...user,
-            ...data,
-        };
-        return this.users[index];
+
+        Object.assign(userEntity, data);
+
+        return userEntity.save();
+    }
+
+    public async deleteAll(): Promise<void> {
+        await this.userEntityRepository.clear();
     }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, Redirect } from '@nestjs/common';
 import { AppService } from './app.service';
 import { HmacGuard } from './auth/guards/hmac.guard';
 
@@ -10,5 +10,11 @@ export class AppController {
     @UseGuards(HmacGuard)
     getHello(): string {
         return this.appService.getHello();
+    }
+
+    @Get('/')
+    @Redirect('/swagger', 301)
+    public redirect(): void {
+        // empty
     }
 }

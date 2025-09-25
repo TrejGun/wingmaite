@@ -5,6 +5,8 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { EventsModule } from './events/events.module';
+import { WingmaiteTypeormModule } from './common/typeorm.module';
+import ormconfig from './ormconfig';
 
 @Module({
     imports: [
@@ -29,6 +31,7 @@ import { EventsModule } from './events/events.module';
                 };
             },
         }),
+        WingmaiteTypeormModule.forRoot(ormconfig),
         UsersModule,
         EventsModule,
     ],

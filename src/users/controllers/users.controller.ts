@@ -1,16 +1,19 @@
 import {
     Body,
+    ClassSerializerInterceptor,
     Controller,
     Get,
     Param,
     Post,
     Put,
     UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { HmacGuard } from '../../auth/guards/hmac.guard';
 
 @Controller('users')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 

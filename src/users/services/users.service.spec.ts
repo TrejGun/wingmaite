@@ -1,11 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
+import { UserEntity } from '../models/user.model';
+import { WingmaiteTypeormModule } from '../../common/typeorm.module';
+import ormconfig from '../../ormconfig';
 
 describe('UsersService', () => {
     let service: UsersService;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
+            imports: [
+                ConfigModule.forRoot(),
+                WingmaiteTypeormModule.forRoot(ormconfig),
+                TypeOrmModule.forFeature([UserEntity]),
+            ],
             providers: [UsersService],
         }).compile();
 
@@ -70,12 +80,16 @@ describe('UsersService', () => {
 
     it('should throw an error if the user is not found', async () => {
         await expect(
-            service.updateUser('1', {
+            service.updateUser('00000000-0000-0000-0000-000000000000', {
                 firstName: 'Jane',
                 lastName: 'Doe',
                 email: 'jane.doe@example.com',
                 password: 'password2',
             }),
         ).rejects.toThrow('User not found');
+    });
+
+    afterEach(async () => {
+        await service.deleteAll();
     });
 });
