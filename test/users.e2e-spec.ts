@@ -8,12 +8,14 @@ import { UsersModule } from '../src/users/users.module';
 import { UserEntity } from '../src/users/models/user.model';
 import { AuthModule } from '../src/auth/auth.module';
 import { WingmaiteTypeormModule } from '../src/common/typeorm.module';
+import { UsersService } from '../src/users/services/users.service';
 import { signRequest } from './utils';
 import { TEST_API_KEY, TEST_HOST, TEST_SECRET } from './constants';
 import ormconfig from '../src/ormconfig';
 
 describe('UsersController (e2e with HMAC)', () => {
     let app: INestApplication;
+    let service: UsersService;
 
     beforeAll(async () => {
         const moduleRef = await Test.createTestingModule({
@@ -37,6 +39,12 @@ describe('UsersController (e2e with HMAC)', () => {
 
         app = moduleRef.createNestApplication();
         await app.init();
+
+        service = moduleRef.get<UsersService>(UsersService);
+    });
+
+    afterEach(async () => {
+        await service.deleteAll();
     });
 
     afterAll(async () => {
