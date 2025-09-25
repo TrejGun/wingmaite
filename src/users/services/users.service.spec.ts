@@ -22,6 +22,10 @@ describe('UsersService', () => {
         service = module.get<UsersService>(UsersService);
     });
 
+    afterEach(async () => {
+        await service.deleteAll();
+    });
+
     it('should be defined', () => {
         expect(service).toBeDefined();
     });
@@ -87,9 +91,5 @@ describe('UsersService', () => {
                 password: 'password2',
             }),
         ).rejects.toThrow('User not found');
-    });
-
-    afterEach(async () => {
-        await service.deleteAll();
     });
 });
