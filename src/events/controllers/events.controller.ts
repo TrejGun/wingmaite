@@ -1,5 +1,5 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { concatMap, delay, from, lastValueFrom, of } from 'rxjs';
+import { concatMap, delay, from, lastValueFrom, of, toArray } from 'rxjs';
 import { HmacGuard } from '../../auth/guards/hmac.guard';
 
 @Controller('events')
@@ -31,12 +31,6 @@ export class EventsController {
     @Get()
     @UseGuards(HmacGuard)
     getEvents() {
-        return lastValueFrom(
-            this.events
-                .pipe
-                // TODO: Implement logic to collect all events
-                // and return them as a single array
-                (),
-        );
+        return lastValueFrom(this.events.pipe(toArray()));
     }
 }
